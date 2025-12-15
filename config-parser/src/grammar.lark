@@ -1,0 +1,43 @@
+start: statement*
+
+statement: const_decl
+         | value ";"     -> value_stmt
+
+const_decl: "const" NAME "=" value ";"
+
+?value: number
+      | STRING
+      | array
+      | object
+      | const_expr
+
+object: "{" [pair ("," pair)*] "}"
+
+pair: NAME "=" value
+
+array: "<<" [value ("," value)*] ">>"
+
+const_expr: "$" expr "$"
+
+?expr: expr "+" term   -> add
+     | expr "-" term   -> sub
+     | term
+
+?term: function
+     | number
+     | NAME           -> var
+
+function: "concat" "(" expr "," expr ")"
+        | "sqrt" "(" expr ")"
+
+number: INT
+
+NAME: /[_a-z]+/
+INT: /[1-9][0-9]*/
+
+STRING: /q\([^)]*\)/
+
+COMMENT: /\{\{\!--(.|\n)*?--\}\}/
+
+%ignore COMMENT
+%ignore /[ \t\r\n]+/
